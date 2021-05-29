@@ -2,16 +2,35 @@
 created by Nagaj at 29/05/2021
 """
 import phonenumbers
+
+from core import BaseMixin
 from errors import InvalidName, InvalidPhoneNumber
+from group import Group
 
 
-class UserProfile:
+class UserProfile(BaseMixin):
     def __init__(self, name, phone, image=None, boi=""):
+        super().__init__()
         self.name = name
         self.phone = phone
         self.image = image
         self.boi = boi
-        self.groups = []
+        self.groups = self.objs
+
+    def is_exist(self, group):
+        return group in self.groups
+
+    def join_group(self, group: Group):
+        if not self.is_exist(group):
+            self.groups.append(group)
+            group.members.append(self)
+            print(f"User <{self.phone}> joined the group <{group.name}>")
+
+    def leave_group(self, group):
+        if self.is_exist(group):
+            self.groups.remove(group)
+            group.members.remove(self)
+            print(f"User <{self.phone}> has left the group <{group.name}>")
 
     def __str__(self):
         return f"{self.name.title()} {self.phone}"
